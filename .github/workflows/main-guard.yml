@@ -1,0 +1,41 @@
+name: Main guard
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  pull-requests-only:
+    name: Every commit on the default branch comes from a pull request
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check pushed commits
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.event.after }}
+          FORCED: ${{ github.event.forced }}
+        run: |
+          if [ "$FORCED" = "true" ]; then
+            echo "::error title=Force push::The default branch was force-pushed."
+            exit 1
+          fi
+          if [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            echo "First push to the branch, nothing to compare."
+            exit 0
+          fi
+          bad=0
+          for sha in $(gh api "repos/$REPO/compare/$BEFORE...$AFTER" --jq '.commits[].sha'); do
+            merged=$(gh api "repos/$REPO/commits/$sha/pulls" --jq '[.[] | select(.merged_at != null)] | length')
+            if [ "$merged" = "0" ]; then
+              echo "::error title=Direct push::Commit $sha reached the default branch without a pull request."
+              bad=1
+            fi
+          done
+          [ "$bad" = 0 ] && echo "All commits came from merged pull requests."
+          exit "$bad"

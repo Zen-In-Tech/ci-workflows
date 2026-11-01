@@ -1,0 +1,24 @@
+name: PR title
+
+on:
+  workflow_call:
+
+permissions: {}
+
+jobs:
+  conventional-commits:
+    name: Conventional Commits
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Check the pull request title
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          pattern='^(feat|fix|docs|refactor|test|perf|build|ci|chore|revert)(\([a-z0-9._/-]+\))?!?: [^ ].*'
+          if [[ "$TITLE" =~ $pattern ]]; then
+            echo "The title follows Conventional Commits."
+          else
+            echo "::error title=PR title::Use '<type>(<scope>): <summary>', for example 'fix(auth): keep session after password reset'. Types: feat, fix, docs, refactor, test, perf, build, ci, chore, revert. Add '!' after the type or scope for a breaking change."
+            exit 1
+          fi
