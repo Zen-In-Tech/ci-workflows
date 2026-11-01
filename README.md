@@ -1,6 +1,8 @@
 # ci-workflows
 
-Reusable GitHub Actions workflows for Zen in Tech projects. Fix CI once here and every project picks it up through Dependabot.
+Reusable GitHub Actions workflows for [Zen in Tech](https://zenintech.com) projects. Fix CI once here and every project picks it up through Dependabot.
+
+This repository is public so that clients can see exactly what runs on their code. It is maintained for our own projects: we do not take outside issues or pull requests, and security reports go through [private vulnerability reporting](https://github.com/Zen-In-Tech/ci-workflows/security/advisories/new).
 
 | Workflow | Runs on | What it checks |
 |---|---|---|
@@ -10,7 +12,7 @@ Reusable GitHub Actions workflows for Zen in Tech projects. Fix CI once here and
 
 ## Usage
 
-Projects created from [`tpl-nextjs`](https://github.com/Zen-In-Tech/tpl-nextjs) already call these workflows. To add them to another repository:
+Projects created from our Next.js template already call these workflows. To add them to another repository:
 
 ```yaml
 # .github/workflows/ci.yml
